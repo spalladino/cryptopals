@@ -99,14 +99,16 @@ def score_freqs(text):
   text_freqs = freqs_for(text)
   return 1.0 / math.sqrt(sum([(freqs[c] - text_freqs[c]) ** 2 for c in freqs.keys()]))
 
-def score(text, alpha=0.5):
+def score(text, alpha=0.5, non_eng_penalization=2, non_char_penalization=0.5):
   """
   Calculates score based on freqs and start freqs, 
   where alpha is the weight for text frequencies and 1-alpha for word start frequencies,
-  penalizing for each non-english character in the string
+  penalizing for each non-english or symbol character in the string
   """
   s = score_freqs(text) * alpha + score_start_freqs(text) * (1-alpha)
-  return s * len([c for c in text if is_english_character(c)]) / len(text)
+  non_eng = float(len([c for c in text if is_english_character(c)])) / len(text)
+  non_char = float(len([c for c in text.lower() if c in freqs.keys()])) / len(text)
+  return s * (non_eng ** non_eng_penalization) * (non_char ** non_char_penalization)
 
 class TestFreqs(unittest.TestCase):  
   

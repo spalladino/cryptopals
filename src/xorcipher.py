@@ -3,7 +3,7 @@ import freqs
 from xor import xor
 from encoding import *
 
-def single_char_xor_cipher(bytes, num_cands=5):
+def single_char_xor_cipher(bytes, num_cands=1):
   """Returns most likely candidates for XOR single char key"""
   text = bytes.tostring()
   keys = []
