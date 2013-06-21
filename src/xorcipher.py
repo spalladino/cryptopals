@@ -3,7 +3,20 @@ import freqs
 from xor import xor
 from encoding import *
 
-def single_char_xor_cipher(bytes):
+def single_char_xor_cipher(bytes, num_cands=5):
+  """Returns most likely candidates for XOR single char key"""
+  text = bytes.tostring()
+  keys = []
+  for c in range(256):
+    mask = [c] * len(bytes)
+    key = xor(bytes, mask).tostring()
+    keys.append((freqs.score(key), key, c))
+
+  candidates = sorted(keys, reverse=True)[0:num_cands]
+  return candidates
+    
+
+if __name__ == '__main__':
   """
   3. Single-character XOR Cipher
 
@@ -20,17 +33,6 @@ def single_char_xor_cipher(bytes):
 
   Tune your algorithm until this works.
   """
-  text = bytes.tostring()
-  keys = []
-  for c in range(256):
-    mask = [c] * len(bytes)
-    key = xor(bytes, mask).tostring()
-    keys.append((freqs.score(key), key, c))
-
-  candidates = sorted(keys, reverse=True)[0:5]
-  return candidates
-    
-
-if __name__ == '__main__':
   input = hex2bytearray("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-  print '\n'.join([str(t) for t in single_char_xor_cipher(input)])
+  [(score, key, mask)] = single_char_xor_cipher(input, 1)
+  print key

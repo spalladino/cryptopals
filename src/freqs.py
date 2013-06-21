@@ -1,5 +1,6 @@
 import unittest
 import math
+import types
 
 # Source: http://en.wikipedia.org/wiki/Letter_frequency
 
@@ -57,9 +58,9 @@ start_freqs = {'a': 0.11602,
   'y': 0.01620,  
   'z': 0.00034}
 
-def chars():
-  """Returns a-z"""
-  return [chr(c) for c in range(ord('a'), ord('z')+1)]
+def is_english_character(c):
+  return ord(c) > 31 and ord(c) < 127
+  
 
 def freq(char):
   """Returns expected frequency of char in english language"""
@@ -67,14 +68,21 @@ def freq(char):
 
 def freqs_for(text):
   """Returns dictionary of frequencies for chars in text or list"""
-  res = {c: 0 for c in chars()}
-  n = float(len(text))
-  try: text = text.lower()
-  except: pass
+  res = {c: 0 for c in freqs.keys()}
+  n = 0
+  
+  if isinstance(text, types.StringType): 
+    text = text.lower()
   
   for char in text: 
     if char in res:
-      res[char] += 1.0 / n
+      res[char] += 1
+      n += 1
+  
+  if n > 0:
+    for char, value in res.items():
+      res[char] = float(value) / n
+  
   return res
 
 def score_start_freqs(text):
@@ -82,21 +90,23 @@ def score_start_freqs(text):
   # Uses inverse of norm2 of distance between frequency vectors
   start_chars = [word[0] for word in text.lower().split()]
   text_start_freqs = freqs_for(start_chars)
-  return 1.0 / math.sqrt(sum([(start_freqs[c] - text_start_freqs[c]) ** 2 for c in chars()]))
+  return 1.0 / math.sqrt(sum([(start_freqs[c] - text_start_freqs[c]) ** 2 for c in freqs.keys()]))
 
 
 def score_freqs(text):
   """Return score based on frequency of letters in text"""
   # Uses inverse of norm2 of distance between frequency vectors
   text_freqs = freqs_for(text)
-  return 1.0 / math.sqrt(sum([(freqs[c] - text_freqs[c]) ** 2 for c in chars()]))
+  return 1.0 / math.sqrt(sum([(freqs[c] - text_freqs[c]) ** 2 for c in freqs.keys()]))
 
 def score(text, alpha=0.5):
   """
   Calculates score based on freqs and start freqs, 
-  where alpha is the weight for text frequencies and 1-alpha for word start frequencies
+  where alpha is the weight for text frequencies and 1-alpha for word start frequencies,
+  penalizing for each non-english character in the string
   """
-  return score_freqs(text) * alpha + score_start_freqs(text) * (1-alpha)
+  s = score_freqs(text) * alpha + score_start_freqs(text) * (1-alpha)
+  return s * len([c for c in text if is_english_character(c)]) / len(text)
 
 class TestFreqs(unittest.TestCase):  
   

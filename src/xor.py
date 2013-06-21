@@ -3,6 +3,12 @@ import unittest
 from encoding import *
 
 def xor(a,b):
+  """Calculates XOR between same-length byte arrays a and b"""
+  if len(a) != len(b): raise StandardError("Both buffers to XOR should have equal length") 
+  return array('B', [a[i] ^ b[i] for i in range(len(a))])
+
+
+class TestEx2(unittest.TestCase):
   """
   2. Fixed XOR
 
@@ -21,11 +27,6 @@ def xor(a,b):
 
    746865206b696420646f6e277420706c6179
   """
-  if len(a) != len(b): raise StandardError("Both buffers to XOR should have equal length") 
-  return array('B', [a[i] ^ b[i] for i in range(len(a))])
-
-
-class TestEx2(unittest.TestCase):
   
   def test_xor(self):
     a = hex2bytearray("1c0111001f010100061a024b53535009181c")
