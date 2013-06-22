@@ -1,5 +1,3 @@
-import unittest
-
 from encoding import *
 from Crypto.Cipher import AES
 

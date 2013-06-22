@@ -96,7 +96,6 @@ def challenge6():
     data = base642bytearray(data)
     [(score, key, text)] = break_repeating_xor_cipher(data, 1)
     
-    # Terminator X: Bring the noise
     print key
     print text
 

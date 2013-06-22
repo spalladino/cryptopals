@@ -32,8 +32,9 @@ def challenge3():
   Tune your algorithm until this works.
   """
   input = hex2bytearray("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-  [(score, key, mask)] = break_single_char_xor_cipher(input, 1)
-  print key
+  [(score, text, mask)] = break_single_char_xor_cipher(input, 1)
+  print text
+  print chr(mask)
 
 if __name__ == '__main__':
   challenge3()
