@@ -3,20 +3,18 @@ import freqs
 from xor import xor
 from encoding import *
 
-def single_char_xor_cipher(bytes, num_cands=1):
+def break_single_char_xor_cipher(bytes, num_cands=1, freqs_score_alpha=0.5):
   """Returns most likely candidates for XOR single char key"""
-  text = bytes.tostring()
   keys = []
   for c in range(256):
     mask = [c] * len(bytes)
     key = xor(bytes, mask).tostring()
-    keys.append((freqs.score(key), key, c))
+    keys.append((freqs.score(key,freqs_score_alpha), key, c))
 
   candidates = sorted(keys, reverse=True)[0:num_cands]
   return candidates
-    
 
-if __name__ == '__main__':
+def challenge3():
   """
   3. Single-character XOR Cipher
 
@@ -34,5 +32,8 @@ if __name__ == '__main__':
   Tune your algorithm until this works.
   """
   input = hex2bytearray("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-  [(score, key, mask)] = single_char_xor_cipher(input, 1)
+  [(score, key, mask)] = break_single_char_xor_cipher(input, 1)
   print key
+
+if __name__ == '__main__':
+  challenge3()

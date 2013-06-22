@@ -9,7 +9,8 @@ def repeating_xor(bytes, key):
   mask = cycle(key)
   return array('B', [byte ^ mask.next() for byte in bytes])
 
-class TestEx5(unittest.TestCase):
+  
+class TestChallenge5(unittest.TestCase):
   """
   5. Repeating-key XOR Cipher
 

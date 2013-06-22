@@ -1,9 +1,9 @@
 import freqs
 
 from encoding import *
-
 from xor import xor
 from xorcipher import single_char_xor_cipher
+
 
 def detect_single_char_xor_cipher(bytes_list, num_cands=5):
   """Returns most likely strings to have been encrpyted by single char XOR"""
@@ -13,9 +13,9 @@ def detect_single_char_xor_cipher(bytes_list, num_cands=5):
     candidates.append((score, key, bytes))
   
   return sorted(candidates, reverse=True)[0:num_cands]
-    
 
-if __name__ == '__main__':
+  
+def challenge4():
   """
   4. Detect single-character XOR
 
@@ -32,3 +32,6 @@ if __name__ == '__main__':
     print bytearray2hex(bytes)
     print key
   
+
+if __name__ == '__main__':
+  challenge4()

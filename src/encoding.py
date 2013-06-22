@@ -1,5 +1,5 @@
 import unittest
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from array import array
 from binascii import hexlify
 
@@ -15,6 +15,10 @@ def bytearray2base64(ary):
   """Converts byte array to base 64 string"""
   return b64encode(ary)
 
+def base642bytearray(str):
+  """Converts base 64 string to byte array"""
+  return array('B', b64decode(str))
+  
 def hex2base64(hex_string):
   """Converts hex string to base 64 string"""
   ary = hex2bytearray(hex_string)
@@ -23,7 +27,7 @@ def hex2base64(hex_string):
 def string2bytearray(string):
   return array('B', string)
 
-class TestEx1(unittest.TestCase):
+class TestChallenge1(unittest.TestCase):
   """
   1. Convert hex to base64 and back.
 

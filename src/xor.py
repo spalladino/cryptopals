@@ -8,7 +8,7 @@ def xor(a,b):
   return array('B', [a[i] ^ b[i] for i in range(len(a))])
 
 
-class TestEx2(unittest.TestCase):
+class TestChallenge2(unittest.TestCase):
   """
   2. Fixed XOR
 
