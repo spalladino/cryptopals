@@ -18,6 +18,12 @@ def bytearray2base64(ary):
 def base642bytearray(str):
   """Converts base 64 string to byte array"""
   return array('B', b64decode(str))
+
+def base64file2bytearray(path):
+  """Converts base 64 file to byte array"""
+  with open(path, 'r') as f:
+    data = "".join([line.strip() for line in f.readlines()])
+    return base642bytearray(data)
   
 def hex2base64(hex_string):
   """Converts hex string to base 64 string"""
@@ -29,6 +35,7 @@ def string2bytearray(string):
 
 def list2bytearray(lst):
   return array('B', lst)
+
 
 class TestChallenge1(unittest.TestCase):
   """

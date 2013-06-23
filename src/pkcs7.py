@@ -2,7 +2,7 @@ import unittest
 
 from encoding import *
 
-def pkcs7(bytes, block_length):
+def pkcs7_pad(bytes, block_length):
   n = len(bytes)
   padding = block_length - (n % block_length)
   if padding == block_length: return bytes
@@ -29,17 +29,17 @@ class TestChallenge9(unittest.TestCase):
   def test_pkcs7(self):
     input = string2bytearray("YELLOW SUBMARINE")
     expected = string2bytearray("YELLOW SUBMARINE\x04\x04\x04\x04")
-    self.assertEqual(pkcs7(input, 20), expected)
+    self.assertEqual(pkcs7_pad(input, 20), expected)
 
   def test_pkcs7_with_array_longer_than_block(self):
     input = string2bytearray("YELLOW SUBMARINE")
     expected = string2bytearray("YELLOW SUBMARINE\x04\x04\x04\x04")
-    self.assertEqual(pkcs7(input, 5), expected)
+    self.assertEqual(pkcs7_pad(input, 5), expected)
 
   def test_pkcs7_with_array_multiple_of_block(self):
     input = string2bytearray("YELLOW SUBMARINE")
     expected = string2bytearray("YELLOW SUBMARINE")
-    self.assertEqual(pkcs7(input, 4), expected)
+    self.assertEqual(pkcs7_pad(input, 4), expected)
 
 
 if __name__ == '__main__':
