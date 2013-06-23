@@ -27,6 +27,9 @@ def hex2base64(hex_string):
 def string2bytearray(string):
   return array('B', string)
 
+def list2bytearray(lst):
+  return array('B', lst)
+
 class TestChallenge1(unittest.TestCase):
   """
   1. Convert hex to base64 and back.
