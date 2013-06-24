@@ -1,6 +1,6 @@
 from pprint import pprint
 from encoding import *
-from aes import *
+from aes_ecb import *
 
 def ecb_score(bytes):
   """Returns a score on how likely this sequence is to have been produced by ECB by detecting 128-bits repeating blocks"""
@@ -10,7 +10,7 @@ def ecb_score(bytes):
     for other_chunk in chunks[index+1:]:
       if chunk == other_chunk:
         score += 1
-  return score
+  return float(score) / len(chunks)
     
 
 def detect_ecb(bytes_list):
