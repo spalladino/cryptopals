@@ -10,12 +10,12 @@ from aes_cbc import encrypt_aes_cbc
 from aes_ecb import encrypt_aes_ecb
 
 
-def encryption_oracle(data, force_key=None, force_mode=None):
+def encryption_oracle(data, force_key=None, force_mode=None, use_prefix=True, use_suffix=True):
   key = force_key or randbytes(16).tostring()
   mode = random.choice('ecb','cbc') if force_mode is None else force_mode
   
-  prefix = randbytes(random.randint(5,10))
-  suffix = randbytes(random.randint(5,10))
+  prefix = randbytes(random.randint(5,10)) if use_prefix else list2bytearray([])
+  suffix = randbytes(random.randint(5,10)) if use_suffix else list2bytearray([])
   to_encrypt = pkcs7_pad(prefix + data + suffix, 16)
 
   if mode == 'cbc':

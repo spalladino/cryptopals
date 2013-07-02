@@ -2,6 +2,7 @@ from pprint import pprint
 from encoding import *
 from aes_ecb import *
 
+
 def ecb_score(bytes):
   """Returns a score on how likely this sequence is to have been produced by ECB by detecting 128-bits repeating blocks"""
   chunks = [bytes[i:i+16] for i in xrange(0, len(bytes), 16)]

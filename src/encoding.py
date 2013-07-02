@@ -15,6 +15,10 @@ def bytearray2base64(ary):
   """Converts byte array to base 64 string"""
   return b64encode(ary)
 
+def base642string(str):
+  """Converts base 64 encoded string to plain text string"""
+  return b64decode(str)
+
 def base642bytearray(str):
   """Converts base 64 string to byte array"""
   return array('B', b64decode(str))
@@ -35,7 +39,7 @@ def string2bytearray(string):
 
 def list2bytearray(lst):
   return array('B', lst)
-
+  
 
 class TestChallenge1(unittest.TestCase):
   """
