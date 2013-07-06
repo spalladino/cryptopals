@@ -108,3 +108,8 @@ The girlies on standby waving just to say hi
 Did you stop? No, I just drove by
 
 // ------------------------------------------------------------
+
+Challenge 13
+See ecb_cut_and_paste.py
+
+// ------------------------------------------------------------
