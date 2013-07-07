@@ -12,10 +12,12 @@ from aes_ecb import *
 from distance import *
 
 key = randbytes(16).tostring()
+unknown_string = base642bytearray("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK")
 
-def encrypt(bytes, wrap_bytes=False):
+
+def encrypt(bytes):
   """Enctyprs with constant key using ECB"""
-  return encryption_oracle(bytes, key, 'ecb', use_prefix=wrap_bytes, use_suffix=wrap_bytes)
+  return encryption_oracle(bytes + unknown_string, key, 'ecb', use_prefix=False, use_suffix=False)
 
 def keysize_candidates(bytes, num_cands=5, num_chunks=12, min=8, max=24):
   """Returns candidates for keysize as list of (score, size), where the lower the score, the better"""
@@ -84,8 +86,6 @@ def challenge12():
 
   f. Repeat for the next byte.
   """
-  unknown_string = base642bytearray("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK")
-
   # Key size is guessed using same technique as in break xor, with a fixed input, and not feeding one byte at a time
   encrypted = encrypt(string2bytearray("A" * 400))
   [(_, keysize)] = keysize_candidates(encrypted, num_cands=1)
@@ -97,20 +97,27 @@ def challenge12():
   print "Method is", method, "with score", score
   
   # Guess the unknown string byte by byte
+  # We use an upper bound for the unknwon string's length, since we don't know it
+  n = len(unknown_string) + 200
+  padded_size = n + keysize - n % keysize
   decrypted = ""
-  n = len(unknown_string)
-  for index in xrange(n):
-    padded_size = n + keysize - n % keysize
-    short_string = string2bytearray("A" * (padded_size - len(decrypted) - 1))
-    encrypted_short_string = encrypt(short_string + unknown_string)
 
+  for index in xrange(n):
+    short_string = string2bytearray("A" * (padded_size - len(decrypted) - 1))
+    encrypted_short_string = encrypt(short_string)
+
+    match_found = False
     for guess in xrange(256):
       guess_string = string2bytearray("A" * (padded_size - len(decrypted) - 1) + decrypted + chr(guess))
       test = encrypt(guess_string)
 
-      if test == encrypted_short_string[0:len(test)]:
+      if test[0:len(guess_string)] == encrypted_short_string[0:len(guess_string)]:
         decrypted += chr(guess)
+        match_found = True
         break
+    
+    if not match_found:
+      break
 
   print
   print decrypted

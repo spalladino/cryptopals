@@ -12,7 +12,14 @@ def ecb_score(bytes):
       if chunk == other_chunk:
         score += 1
   return float(score) / len(chunks)
-    
+
+
+def aes_method(bytes, min_score_for_ecb=1):
+  """Returns whether the AES method used is ECB or CBC"""
+  score = ecb_score(bytes)
+  method = 'ecb' if score > min_score_for_ecb else 'cbc'
+  return method, score
+
 
 def detect_ecb(bytes_list):
   """Attempts to guess which byte array in the list was encoded with ECB"""

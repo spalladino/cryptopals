@@ -113,3 +113,18 @@ Challenge 13
 See ecb_cut_and_paste.py
 
 // ------------------------------------------------------------
+
+Challenge 14
+See decrypt_ecb_partial_control.py
+
+Code is the same as in full control version, except that it calculates the
+size of the "AAAAAA..." string required to ensure the target string
+begins in a new block, by attempting different sizes and checking how
+many chunks equal to "A" * KEYSIZE are present in the string.
+
+// ------------------------------------------------------------
+
+Challenge 15
+Added to pkcs7.py
+
+// ------------------------------------------------------------
