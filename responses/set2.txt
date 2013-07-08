@@ -122,9 +122,16 @@ size of the "AAAAAA..." string required to ensure the target string
 begins in a new block, by attempting different sizes and checking how
 many chunks equal to "A" * KEYSIZE are present in the string.
 
+I have no idea how I've used the words STIMULUS and RESPONSE here.
+
 // ------------------------------------------------------------
 
 Challenge 15
-Added to pkcs7.py
+Added function to pkcs7.py
+
+// ------------------------------------------------------------
+
+Challenge 16
+See cbc_bit_flipping.py
 
 // ------------------------------------------------------------

@@ -7,6 +7,10 @@ def xor(a,b):
   if len(a) != len(b): raise StandardError("Both buffers to XOR should have equal length") 
   return array('B', [a[i] ^ b[i] for i in range(len(a))])
 
+def complement(a):
+  """Calculates complement of byte array"""
+  return xor(a, [255] * len(a))
+
 
 class TestChallenge2(unittest.TestCase):
   """
