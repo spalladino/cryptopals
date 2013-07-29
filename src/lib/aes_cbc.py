@@ -3,15 +3,15 @@ from utils import *
 
 from xor import xor
 from aes_ecb import encrypt_aes_ecb, decrypt_aes_ecb
-from pkcs7 import pkcs7_pad
+from pkcs7 import pkcs7_pad, InvalidPaddingException
 
 BLOCKSIZE = 16
 
-
-def encrypt_aes_cbc(data, key, iv=string2bytearray("\x00" * 16)):
+def encrypt_aes_cbc(data, key, iv=string2bytearray("\x00" * 16), pad=False):
   output = []
-  data = pkcs7_pad(data, BLOCKSIZE)
-  
+  if pad: data = pkcs7_pad(data, BLOCKSIZE)
+  elif len(data) % BLOCKSIZE != 0: raise InvalidPaddingException("AES CBC encryption requires data multiple of {0}".format(BLOCKSIZE))
+
   xor_str = iv
   for block in blocks(data, BLOCKSIZE):
     encrypted = encrypt_aes_ecb(xor(block, xor_str), key)
@@ -35,7 +35,7 @@ def decrypt_aes_cbc(data, key, iv=string2bytearray("\x00" * 16)):
 
 class TestCBC(unittest.TestCase):
   """Tests CBC encryption/decryption"""
-  
+
   def test_encrpyt_decrypt(self):
     data = string2bytearray("12345678901234567890123456789012")
     key = "YELLOW SUBMARINE".lower()
@@ -45,7 +45,7 @@ class TestCBC(unittest.TestCase):
     data = string2bytearray("123456789012345678901234567890")
     expected = string2bytearray("123456789012345678901234567890\x02\x02")
     key = "YELLOW SUBMARINE".lower()
-    self.assertEqual(decrypt_aes_cbc(encrypt_aes_cbc(data, key), key), expected)
+    self.assertEqual(decrypt_aes_cbc(encrypt_aes_cbc(data, key, pad=True), key), expected)
 
 
 def challenge10():
@@ -77,9 +77,9 @@ def challenge10():
 
   key = "YELLOW SUBMARINE"
   iv = string2bytearray("\x00" * 16)
-  data = base64file2bytearray('../resources/aes_cbc.txt')
+  data = base64file2bytearray('../../resources/aes_cbc.txt')
   print decrypt_aes_cbc(data, key, iv).tostring()
-    
+
 
 if __name__ == '__main__':
   challenge10()

@@ -1,11 +1,12 @@
-import freqs
-
 from pprint import pprint
-from encoding import *
-from distance import *
+
+from lib.freqs import score
+from lib.encoding import *
+from lib.distance import *
+from lib.xor import xor, repeating_xor
+
 from break_xor_cipher import *
-from repeatingxor import *
-from xor import xor
+
 
 def keysize_candidates(bytes, num_cands=1, num_chunks=2, min=2, max=40):
   """Returns candidates for XOR keysize as list of (score, size), where the lower the score, the better"""
@@ -20,11 +21,11 @@ def keysize_candidates(bytes, num_cands=1, num_chunks=2, min=2, max=40):
     candidates.append((average, keysize))
   return sorted(candidates)[0:num_cands]
 
-  
+
 def transpose(bytes, size):
   """Breaks byte array into blocks of specified size and transposes them"""
   return [ [bytes[j] for j in xrange(i,len(bytes),size)] for i in xrange(size) ]
-  
+
 
 def break_repeating_xor_cipher(bytes, num_cands=5):
   """Attempts to break variable length repeating XOR key"""
@@ -34,13 +35,13 @@ def break_repeating_xor_cipher(bytes, num_cands=5):
     for block in transpose(bytes, keysize):
       [(single_score, _, char)] = break_single_char_xor_cipher(block, freqs_score_alpha=1.0)
       key.append(char)
-    
+
     text = repeating_xor(bytes, key).tostring()
-    candidates.append((freqs.score(text), array('B',key).tostring(), text))
-  
+    candidates.append((score(text), array('B',key).tostring(), text))
+
   return sorted(candidates, reverse=True)[0:num_cands]
 
-  
+
 def challenge6():
   """
   6. Break repeating-key XOR
@@ -95,10 +96,10 @@ def challenge6():
     data = "".join([line.strip() for line in f.readlines()])
     data = base642bytearray(data)
     [(score, key, text)] = break_repeating_xor_cipher(data, 1)
-    
+
     print key
     print text
 
-    
+
 if __name__ == '__main__':
   challenge6()

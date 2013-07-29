@@ -1,7 +1,7 @@
-import freqs
+import lib.freqs as freqs
 
-from xor import xor
-from encoding import *
+from lib.xor import xor
+from lib.encoding import *
 
 def break_single_char_xor_cipher(bytes, num_cands=1, freqs_score_alpha=0.5):
   """Returns most likely candidates for XOR single char key"""

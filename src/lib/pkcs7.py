@@ -12,7 +12,6 @@ def pkcs7_pad(bytes, block_length=16):
   """Pads a byte array using PKCS7"""
   n = len(bytes)
   padding = block_length - (n % block_length)
-  if padding == block_length: return bytes
   bytes[n:n+padding] = list2bytearray([padding] * padding)
   return bytes
 
@@ -23,12 +22,27 @@ def pkcs7_strip(bytes):
   if all(byte == last for byte in bytes[-last:]):
     return bytes[:-last]
   else:
-    raise Exception("Invalid padding for byte sequence")
+    raise InvalidPaddingException("Invalid padding for byte sequence")
 
 
 def pkcs7_strip_string(string):
   """Strips PKCS7 padding from a string"""
   return pkcs7_strip(string2bytearray(string)).tostring()
+
+
+def pkcs7_valid(bytes):
+  """Returns true or false depending whether the pkcs7 padding is valid"""
+  try:
+    pkcs7_strip(bytes)
+  except InvalidPaddingException:
+    return False
+  else:
+    return True
+
+
+class InvalidPaddingException(Exception):
+  pass
+
 
 
 class TestChallenge15(unittest.TestCase):
@@ -61,6 +75,15 @@ class TestChallenge15(unittest.TestCase):
     expected = string2bytearray("ICE ICE BABY")
     self.assertEqual(pkcs7_strip(input), expected)
 
+  def test_pkcs7_strip_no_padding(self):
+    input = string2bytearray("ICE ICE BABY BYE")
+    self.assertRaises(InvalidPaddingException, pkcs7_strip, (input))
+
+  def test_pkcs7_strip_full_padding(self):
+    input = string2bytearray("ICE ICE BABY BYE\x04\x04\x04\x04")
+    expected = string2bytearray("ICE ICE BABY BYE")
+    self.assertEqual(pkcs7_strip(input), expected)
+
   def test_pkcs7_strip_string(self):
     input = "ICE ICE BABY\x04\x04\x04\x04"
     expected = "ICE ICE BABY"
@@ -68,8 +91,7 @@ class TestChallenge15(unittest.TestCase):
 
   def test_pkcs7_strip_invalid_padding(self):
     input = string2bytearray("ICE ICE BABY\x05\x05\x05\x05")
-    self.assertRaises(Exception, pkcs7_strip, (input))
-
+    self.assertRaises(InvalidPaddingException, pkcs7_strip, (input))
 
 
 class TestChallenge9(unittest.TestCase):
@@ -88,7 +110,7 @@ class TestChallenge9(unittest.TestCase):
   The particulars of this algorithm are easy to find online.
   """
 
-  def test_pkcs7(self):
+  def test_pkcs7_with_block_longer_than_array(self):
     input = string2bytearray("YELLOW SUBMARINE")
     expected = string2bytearray("YELLOW SUBMARINE\x04\x04\x04\x04")
     self.assertEqual(pkcs7_pad(input, 20), expected)
@@ -100,7 +122,7 @@ class TestChallenge9(unittest.TestCase):
 
   def test_pkcs7_with_array_multiple_of_block(self):
     input = string2bytearray("YELLOW SUBMARINE")
-    expected = string2bytearray("YELLOW SUBMARINE")
+    expected = string2bytearray("YELLOW SUBMARINE" + "\x04" * 4)
     self.assertEqual(pkcs7_pad(input, 4), expected)
 
 

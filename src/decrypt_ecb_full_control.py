@@ -2,14 +2,13 @@ import unittest
 import random
 
 from pprint import pprint
-from oracle import encryption_oracle
-from detect_ecb import ecb_score
 
-from utils import *
-from random import *
-from encoding import *
-from aes_ecb import *
-from distance import *
+from lib.aes_method import ecb_score
+from lib.oracle import encryption_oracle
+
+from lib.utils import *
+from lib.encoding import *
+from lib.distance import *
 
 key = randbytes(16).tostring()
 unknown_string = base642bytearray("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK")
@@ -17,7 +16,7 @@ unknown_string = base642bytearray("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wI
 
 def encrypt(bytes):
   """Enctyprs with constant key using ECB"""
-  return encryption_oracle(bytes + unknown_string, key, 'ecb', use_prefix=False, use_suffix=False)
+  return encryption_oracle(bytes + unknown_string, key, 'ecb')
 
 def keysize_candidates(bytes, num_cands=5, num_chunks=12, min=8, max=24):
   """Returns candidates for keysize as list of (score, size), where the lower the score, the better"""
@@ -95,7 +94,7 @@ def challenge12():
   score = ecb_score(encrypted)
   method = 'ecb' if score > 0.1 else 'cbc'
   print "Method is", method, "with score", score
-  
+
   # Guess the unknown string byte by byte
   # We use an upper bound for the unknwon string's length, since we don't know it
   n = len(unknown_string) + 200
@@ -115,13 +114,13 @@ def challenge12():
         decrypted += chr(guess)
         match_found = True
         break
-    
+
     if not match_found:
       break
 
   print
   print decrypted
-  
+
 
 if __name__ == '__main__':
   challenge12()

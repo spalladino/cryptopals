@@ -5,15 +5,14 @@ import urllib
 import re
 
 from pprint import pprint
-from oracle import encryption_oracle
-from detect_ecb import ecb_score
+from lib.oracle import encryption_oracle
+from lib.aes_method import ecb_score
 
-from pkcs7 import *
-from utils import *
-from random import *
-from encoding import *
-from aes_ecb import *
-from distance import *
+from lib.pkcs7 import *
+from lib.utils import *
+from lib.encoding import *
+from lib.aes_ecb import *
+from lib.distance import *
 
 key = randbytes(16).tostring()
 
@@ -106,7 +105,7 @@ def challenge13():
   profile.
   """
   keysize = 16
-  
+
   padded_role = pkcs7_pad_string("admin", keysize)
   fake_email = "A" * (keysize - len("email=")) + padded_role
   profile = profile_for(fake_email)

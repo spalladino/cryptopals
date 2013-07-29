@@ -17,7 +17,7 @@ def decrypt_aes_ecb(bytes, key):
 
 class TestECB(unittest.TestCase):
   """Tests ECB encryption/decryption"""
-  
+
   def test_encrpyt_decrypt(self):
     data = string2bytearray("12345678901234567890123456789012")
     key = "YELLOW SUBMARINE"
@@ -45,9 +45,9 @@ def challenge7():
   Use OpenSSL::Cipher and give it AES-128-ECB as the cipher.
   """
   key = "YELLOW SUBMARINE"
-  data = base64file2bytearray('../resources/aes_ecb.txt')
+  data = base64file2bytearray('../../resources/aes_ecb.txt')
   print decrypt_aes_ecb(data, key).tostring()
-    
+
 
 if __name__ == '__main__':
   challenge7()

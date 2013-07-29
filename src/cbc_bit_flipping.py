@@ -2,16 +2,13 @@ import unittest
 import random
 
 from pprint import pprint
-from oracle import encryption_oracle
-from detect_ecb import ecb_score
-from aes_cbc import encrypt_aes_cbc, decrypt_aes_cbc
-from xor import xor, complement
+from lib.aes_method import ecb_score
+from lib.aes_cbc import encrypt_aes_cbc, decrypt_aes_cbc
+from lib.xor import xor, complement
 
-from utils import *
-from random import *
-from encoding import *
-from aes_ecb import *
-from distance import *
+from lib.utils import *
+from lib.encoding import *
+from lib.distance import *
 
 key = randbytes(16).tostring()
 
@@ -29,7 +26,7 @@ def create_encrypted_cookie(userdata):
 
 def encrypt(data):
   """Encrypts data using CBC and a fixed key"""
-  return encrypt_aes_cbc(string2bytearray(data), key)
+  return encrypt_aes_cbc(string2bytearray(data), key, pad=True)
 
 
 def is_admin(encrypted):
@@ -49,15 +46,15 @@ class TestChallenge16(unittest.TestCase):
     input = encrypt("foo=bar;admin=true;baz=bat;")
     self.assertEqual(is_admin(input), True)
 
-  def test_is_admin_not_set(self):  
+  def test_is_admin_not_set(self):
     input = encrypt("foo=bar;baz=bat;")
     self.assertEqual(is_admin(input), False)
 
-  def test_cannot_forge_admin(self):  
+  def test_cannot_forge_admin(self):
     input = create_encrypted_cookie("foo;admin=true;")
     self.assertEqual(is_admin(input), False)
 
-  def test_is_not_admin(self):  
+  def test_is_not_admin(self):
     input = encrypt("foo=bar;admin=false;baz=bat;")
     self.assertEqual(is_admin(input), False)
 
@@ -108,12 +105,12 @@ def challenge16():
 
   bytes_to_change = xor(string2bytearray("A" * 16), string2bytearray("AAAB;admin=true;"))
   mangled_block =   xor(encrypted[32:48], bytes_to_change)
-  
+
   encrypted[32:48] = mangled_block
 
   print is_admin(encrypted)
 
 
 if __name__ == '__main__':
-  # unittest.main()
   challenge16()
+  unittest.main()

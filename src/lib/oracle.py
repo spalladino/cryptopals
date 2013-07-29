@@ -5,16 +5,18 @@ from encoding import *
 from utils import *
 
 from pkcs7 import pkcs7_pad
-from detect_ecb import ecb_score
+from aes_method import aes_method
 from aes_cbc import encrypt_aes_cbc
 from aes_ecb import encrypt_aes_ecb
 
+def random_key():
+  return randbytes(16).tostring()
 
-def encryption_oracle(data, force_key=None, force_mode=None, use_prefix=True, use_suffix=True):
-  key = force_key or randbytes(16).tostring()
+def encryption_oracle(data, force_key=None, force_mode=None, use_prefix=False, use_suffix=False):
+  key = force_key or random_key()
   keysize = len(key)
   mode = random.choice('ecb','cbc') if force_mode is None else force_mode
-  
+
   prefix = randbytes(random.randint(5,10)) if use_prefix else list2bytearray([])
   suffix = randbytes(random.randint(5,10)) if use_suffix else list2bytearray([])
   to_encrypt = pkcs7_pad(prefix + data + suffix, keysize)
@@ -25,12 +27,6 @@ def encryption_oracle(data, force_key=None, force_mode=None, use_prefix=True, us
     return encrypt_aes_ecb(to_encrypt, key)
   else:
     raise StandardError("Mode not supported: " + mode)
-
-
-def guess_encryption(data):
-  """Attempts to guess encryption mode of a byte array, either ecb or cbc"""
-  # TODO: Fine-tune tolerance
-  return 'ecb' if ecb_score(data) > 0.001 else 'cbc'
 
 
 class TestChallenge11(unittest.TestCase):
@@ -61,16 +57,16 @@ class TestChallenge11(unittest.TestCase):
   """
 
   def setUp(self):
-    with open('../resources/oracle.txt', 'r') as f:
+    with open('../../resources/oracle.txt', 'r') as f:
       self.data = string2bytearray(f.read())
 
   def test_guess_ecb(self):
-    encrypted = encryption_oracle(self.data, force_mode='ecb')
-    self.assertEqual(guess_encryption(encrypted), 'ecb')
+    encrypted = encryption_oracle(self.data, force_mode='ecb', use_prefix=True, use_suffix=True)
+    self.assertEqual(aes_method(encrypted, min_score_for_ecb=0.001)[0], 'ecb')
 
   def test_guess_cbc(self):
-    encrypted = encryption_oracle(self.data, force_mode='cbc')
-    self.assertEqual(guess_encryption(encrypted),'cbc')
+    encrypted = encryption_oracle(self.data, force_mode='cbc', use_prefix=True, use_suffix=True)
+    self.assertEqual(aes_method(encrypted, min_score_for_ecb=0.001)[0],'cbc')
 
 if __name__ == '__main__':
     unittest.main()

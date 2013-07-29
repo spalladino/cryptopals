@@ -2,19 +2,17 @@ import unittest
 import random
 
 from pprint import pprint
-from oracle import encryption_oracle
 
-from detect_ecb import *
-from utils import *
-from random import *
-from encoding import *
-from aes_ecb import *
-from distance import *
+from lib.oracle import encryption_oracle
+from lib.aes_method import aes_method
+from lib.utils import *
+from lib.encoding import *
+from lib.aes_ecb import *
+from lib.distance import *
 
 unknown_string = base642bytearray("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK")
 key = randbytes(16).tostring()
 prefix = randbytes(4,160)
-
 
 def encrypt(bytes):
   """Encrypts with constant key using ECB"""
@@ -43,7 +41,7 @@ def find_attacker_size(keysize, plain_chunk):
     encrypted = encrypt(string2bytearray("A" * size))
     chunks = [encrypted[i:i+keysize] for i in xrange(keysize*10, len(encrypted), keysize)]
     num_plain_chunks = len([chunk for chunk in chunks if chunk == plain_chunk])
-    
+
     # When the number of "AAAA..." chunks increases by one, it means we have moved the target string to a new block
     if previous_num_plain_chunks is not None and num_plain_chunks == previous_num_plain_chunks+1:
       return size, (num_plain_chunks+10) * keysize
@@ -78,7 +76,7 @@ def challenge14():
   # Ensure it is using ECB
   method, score = aes_method(encrypted)
   print "Method is", method, "with score", score
-  
+
   # Start by finding out how a bunch of A's look like encrypted under target key
   # We assume that after keysize * 10 there is no 'prefix' left
   plain_chunk = encrypted[keysize * 10 : keysize * 11]
@@ -104,13 +102,13 @@ def challenge14():
         decrypted += chr(guess)
         match_found = True
         break
-    
+
     if not match_found:
       break
 
   print
   print decrypted
-  
+
 
 if __name__ == '__main__':
   challenge14()

@@ -1,14 +1,20 @@
 import unittest
 
+from itertools import cycle
 from encoding import *
 
 def xor(a,b):
   """Calculates XOR between same-length byte arrays a and b"""
-  if len(a) != len(b): raise StandardError("Both buffers to XOR should have equal length") 
+  if len(a) != len(b): raise StandardError("Both buffers to XOR should have equal length")
   return array('B', [a[i] ^ b[i] for i in range(len(a))])
 
+def repeating_xor(bytes, key):
+  """Applies repating key XOR to input byte array"""
+  mask = cycle(key)
+  return array('B', [byte ^ mask.next() for byte in bytes])
+
 def complement(a):
-  """Calculates complement of byte array"""
+  """Calculates the complement of a byte array"""
   return xor(a, [255] * len(a))
 
 
@@ -31,7 +37,7 @@ class TestChallenge2(unittest.TestCase):
 
    746865206b696420646f6e277420706c6179
   """
-  
+
   def test_xor(self):
     a = hex2bytearray("1c0111001f010100061a024b53535009181c")
     b = hex2bytearray("686974207468652062756c6c277320657965")
