@@ -1,5 +1,6 @@
 from encoding import *
 from utils import *
+from resources import *
 
 from xor import xor
 from aes_ecb import encrypt_aes_ecb, decrypt_aes_ecb
@@ -77,7 +78,7 @@ def challenge10():
 
   key = "YELLOW SUBMARINE"
   iv = string2bytearray("\x00" * 16)
-  data = base64file2bytearray('../../resources/aes_cbc.txt')
+  data = base64file2bytearray(resource_path('aes_cbc.txt'))
   print decrypt_aes_cbc(data, key, iv).tostring()
 
 

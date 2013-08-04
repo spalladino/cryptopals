@@ -3,6 +3,7 @@ import random
 
 from encoding import *
 from utils import *
+from resources import *
 
 from pkcs7 import pkcs7_pad
 from aes_method import aes_method
@@ -57,7 +58,7 @@ class TestChallenge11(unittest.TestCase):
   """
 
   def setUp(self):
-    with open('../../resources/oracle.txt', 'r') as f:
+    with open(resource_path('oracle.txt'), 'r') as f:
       self.data = string2bytearray(f.read())
 
   def test_guess_ecb(self):
