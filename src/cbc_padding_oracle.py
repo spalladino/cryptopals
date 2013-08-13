@@ -1,4 +1,7 @@
 from lib.encoding import *
+from lib.xor import *
+from lib.utils import *
+
 from random import choice
 from lib.oracle import random_key
 from lib.aes_cbc import decrypt_aes_cbc, encrypt_aes_cbc
@@ -19,10 +22,11 @@ strings = [
   "MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93"
 ]
 
-def encrypt_random_string():
-  """Picks a random string from the sample and encrypts it using a constant key, returning the encrypted string and the iv"""
+def encrypt_string(string=None):
+  """Picks a random string or use the specified one from the sample and encrypts it using a constant key, returning the encrypted string and the iv"""
   iv = string2bytearray(random_key())
-  to_encrypt = pkcs7_pad(base642bytearray(choice(strings)))
+  string = string or choice(strings)
+  to_encrypt = pkcs7_pad(base642bytearray(string))
   return (encrypt_aes_cbc(to_encrypt, key, iv), iv)
 
 def check_encrypted_padding(encrypted, iv):
@@ -34,7 +38,7 @@ def check_encrypted_padding(encrypted, iv):
 class TestChallenge17(unittest.TestCase):
 
   def test_encrypt_and_check(self):
-    self.assertTrue(check_encrypted_padding(*encrypt_random_string()))
+    self.assertTrue(check_encrypted_padding(*encrypt_string()))
 
   def test_check_incorrect(self):
     iv = string2bytearray(random_key())
@@ -109,14 +113,22 @@ def challenge17():
   block, whether it's padded or not.
   """
 
-  encrypted, iv = encrypt_random_string()
+  s = strings[0]
+  encrypted, iv = encrypt_string(s)
   first_block = encrypted[0:16]
-  print len(first_block)
-  print check_encrypted_padding(first_block, iv)
 
-  pass
+  for block in generateblocks(16):
+    xored = xor(iv, block)
+    if check_encrypted_padding(first_block, xored):
+      print "YAY!"
+      print xored
+      print iv
+      print block
+      break
+
+
 
 if __name__ == '__main__':
   challenge17()
-  unittest.main()
+  # unittest.main()
 

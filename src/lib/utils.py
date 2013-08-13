@@ -10,3 +10,12 @@ def randbytes(length, max_length=None):
   """Returns block of random bytes"""
   length = length if max_length is None else random.randint(length, max_length)
   return list2bytearray([random.randint(0,255) for i in xrange(length)])
+
+def generateblocks(block_size):
+  """Iterates over all possible blocks of specified size in order, starting with zeroes"""
+  if block_size == 0:
+    yield []
+    return
+  for i in range(256):
+    for tail in generateblocks(block_size - 1):
+      yield ([i] + tail)
