@@ -1,5 +1,14 @@
 require "../spec_helper"
 
+# Detect single-character XOR
+# ----------------------------
+#
+# One of the 60-character strings in file `c4.input.txt` has been encrypted by single-character XOR.
+#
+# Find it.
+#
+# (Your code from #3 should help.)
+# 
 describe "1.4" do
   it "detects single-byte XOR cipher" do
     inputs = File.read("./spec/set1/data/c4.input.txt").split("\n").map(&.strip).reject(&.empty?)
