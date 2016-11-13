@@ -22,6 +22,12 @@ class String
   end
 end
 
+class Array(T)
+  def to_slice : Slice(T)
+    Slice(T).new(Slice(T).new(self.size).copy_from(self.to_unsafe, self.size), self.size)
+  end
+end
+
 struct Slice(T)
   def to_base64 : String
     Base64.strict_encode(self)

@@ -30,12 +30,22 @@ end
 
 struct Char
   def freq : Float32
-    Cryptopals::FREQUENCIES.fetch(self.upcase, 0_f32) rescue 0_f32
+    Cryptopals::FREQUENCIES.fetch(self.upcase, -1_f32) rescue 0_f32
   end
 end
 
 class String
   def freqscore : Float32
     self.chars.map(&.freq).sum rescue 0_f32
+  end
+
+  def hamming_distance(other : String) : Int32
+    self.to_slice.hamming_distance(other.to_slice)
+  end
+end
+
+struct Slice(T)
+  def hamming_distance(other : Bytes) : Int32
+    self.xor(other).map(&.popcount.to_i32).sum
   end
 end
