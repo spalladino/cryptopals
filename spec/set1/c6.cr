@@ -43,18 +43,19 @@ describe "1.6" do
                + chunks[2].hamming_distance(chunks[3])).to_f32 / keysize
 
       { keysize: keysize, score: score }
-    end.sort_by(&.[:score])[0..5]
+    end.sort_by(&.[:score])[0..3]
 
     # Try breaking the text for each keysize candidate
     results = Array(NamedTuple(string: String, key: Bytes, score: Float32)).new
+
     keysize_candidates.each do |keysize|
       keys_per_block = input.in_groups_of(keysize[:keysize], filled_up_with: 0_u8).transpose.map do |block|
-        Cryptopals::XorCipher.single_char_xor_strings(block.to_slice).first(4).map(&.[:mask])
+        Cryptopals::XorCipher.single_char_xor_strings(block.to_slice).first(5).map(&.[:mask])
       end
 
-      keys = [0,1,2,3].repeated_combinations(keysize[:keysize]).map do |indices|
-        keys_per_block.map_with_index { |keys, i| keys[indices[i]] }
-      end
+      keys = [0,1,2,3,4].repeated_combinations(keysize[:keysize]).map do |indices|
+        keys_per_block.map_with_index { |keys, i| keys.at(indices[i]) { 0_u8 } }
+      end.reject { |key| key.any? { |k| k == 0_u8 } }
 
       keys.each do |key|
         translated = String.new(Cryptopals::XorCipher.repeating_key_xor(input, key.to_slice))
@@ -63,6 +64,8 @@ describe "1.6" do
     end
 
     # Sort the results by score
-    results.sort_by(&.[:score].-).select{|r| r[:string].starts_with?("I'm back")}.first(100).each {|r| puts r[:string][0..80] }
+    # results.sort_by(&.[:score]).first(100).each {|r| puts "#{String.new(r[:key])}\n#{r[:string]}\n" }
+    expected = {string: "I'm back and I'm ringin' the bell", key: "Terminator X: Bring the noise"}
+    results.sort_by(&.[:score]).first(10).map { |r| {string: r[:string][0...33], key: String.new(r[:key])} }.should contain(expected)
   end
 end
