@@ -1,7 +1,5 @@
 require "openssl/cipher"
 
-
-
 module Cryptopals
 
   module AES
