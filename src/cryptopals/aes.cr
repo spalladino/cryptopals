@@ -4,22 +4,55 @@ module Cryptopals
 
   module AES
 
-    def self.encrypt_cbc(plaintext : Bytes, key : Bytes)
+    def self.decrypt_cbc_128(ciphertext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
+      raise "Invalid key size: #{key.size}" unless key.size == 16
+      raise "Invalid iv size: #{iv.size}" unless iv.size == 16
+
+      result = Slice(UInt8).new(ciphertext.size)
+      previous = iv
+      (0...ciphertext.size).step(16) do |index|
+        block = ciphertext[index, 16]
+        decrypted = decrypt_ecb_128(block, key).xor(previous)
+        target = result + index
+        target.copy_from(decrypted.to_unsafe, 16)
+        previous = block
+      end
+      result
+    end
+
+    def self.encrypt_cbc_128(plaintext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
+      raise "Invalid key size: #{key.size}" unless key.size == 16
+      raise "Invalid iv size: #{iv.size}" unless iv.size == 16
+
+      result = Slice(UInt8).new(plaintext.size)
+      previous = iv
+      (0...plaintext.size).step(16) do |index|
+        block = plaintext[index, 16]
+        encrypted = encrypt_ecb_128(block.xor(previous), key)
+        target = result + index
+        target.copy_from(encrypted.to_unsafe, 16)
+        previous = encrypted
+      end
+      result
     end
 
     def self.decrypt_ecb_128(ciphertext : Bytes, key : Bytes)
-      crypt_ecb_128(ciphertext, key, false)
+      raise "Invalid key size: #{key.size}" unless key.size == 16
+      cipher("AES-128-ECB", false, ciphertext, key)
     end
 
     def self.encrypt_ecb_128(plaintext : Bytes, key : Bytes)
-      crypt_ecb_128(plaintext, key, true)
+      raise "Invalid key size: #{key.size}" unless key.size == 16
+      cipher("AES-128-ECB", true, plaintext, key)
     end
 
-    private def self.crypt_ecb_128(text : Bytes, key : Bytes, encrypt : Bool)
-      cipher = OpenSSL::Cipher.new("AES-128-ECB")
+    private def self.cipher(cipher_algorithm : String, encrypt : Bool, text : Bytes, key : Bytes, iv = nil)
+      cipher = OpenSSL::Cipher.new(cipher_algorithm)
       result = MemoryIO.new
       encrypt ? cipher.encrypt : cipher.decrypt
+      cipher.padding = false
       cipher.key = key
+      cipher.iv = iv if iv
       result.write(cipher.update(text))
       result.write(cipher.final)
       result.to_slice

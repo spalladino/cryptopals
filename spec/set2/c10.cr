@@ -15,7 +15,7 @@ require "../spec_helper"
 #
 describe "2.10" do
 
-  it "encrypts ECB" do
+  it "encrypts AES ECB" do
     text = "I'm back and I'm ringin the bell".to_slice
     key = "YELLOW SUBMARINE".to_slice
     encrypted = Cryptopals::AES.encrypt_ecb_128(text, key)
@@ -23,8 +23,27 @@ describe "2.10" do
     decrypted.should eq(text)
   end
 
-  it "decrypts CBC" do
-    input = Base64.decode(File.read("./spec/set1/data/c7.input.txt").strip).to_slice
+  it "decrypts AES CBC" do
+    input = Base64.decode(File.read("./spec/set2/data/c10.input.txt").strip).to_slice
+    key = "YELLOW SUBMARINE".to_slice
+    String.new(Cryptopals::AES.decrypt_cbc_128(input, key))[0..32].should eq("I'm back and I'm ringin' the bell")
+  end
+
+  it "encrypts and decrypts AES CBC" do
+    text = "I'm back and I'm ringin the bell".to_slice
+    key = "YELLOW SUBMARINE".to_slice
+    encrypted = Cryptopals::AES.encrypt_cbc_128(text, key)
+    decrypted = Cryptopals::AES.decrypt_cbc_128(encrypted, key)
+    decrypted.should eq(text)
+  end
+
+  it "encrypts and decrypts AES CBC with iv" do
+    text = "I'm back and I'm ringin the bell".to_slice
+    key = "YELLOW SUBMARINE".to_slice
+    iv =  "HELLO WORLD 1234".to_slice
+    encrypted = Cryptopals::AES.encrypt_cbc_128(text, key, iv)
+    decrypted = Cryptopals::AES.decrypt_cbc_128(encrypted, key, iv)
+    decrypted.should eq(text)
   end
 
 end
