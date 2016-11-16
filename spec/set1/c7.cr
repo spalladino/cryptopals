@@ -17,7 +17,7 @@ describe "1.7" do
   it "decrypts aes in ecb mode" do
     input = Base64.decode(File.read("./spec/set1/data/c7.input.txt").strip).to_slice
     key = "YELLOW SUBMARINE"
-    result = String.new(Cryptopals::AES.decrypt_ecb_128(key.to_slice, input))
+    result = String.new(Cryptopals::AES.decrypt_ecb_128(input, key.to_slice))
     result[0...33].should eq("I'm back and I'm ringin' the bell")
   end
 end

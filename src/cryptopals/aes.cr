@@ -4,15 +4,18 @@ module Cryptopals
 
   module AES
 
-    def self.decrypt_ecb_128(key : Bytes, ciphertext : Bytes)
-      crypt_ecb_128(key, ciphertext, false)
+    def self.encrypt_cbc(plaintext : Bytes, key : Bytes)
     end
 
-    def self.encrypt_ecb_128(key : Bytes, plaintext : Bytes)
-      crypt_ecb_128(key, plaintext, true)
+    def self.decrypt_ecb_128(ciphertext : Bytes, key : Bytes)
+      crypt_ecb_128(ciphertext, key, false)
     end
 
-    private def self.crypt_ecb_128(key : Bytes, text : Bytes, encrypt : Bool)
+    def self.encrypt_ecb_128(plaintext : Bytes, key : Bytes)
+      crypt_ecb_128(plaintext, key, true)
+    end
+
+    private def self.crypt_ecb_128(text : Bytes, key : Bytes, encrypt : Bool)
       cipher = OpenSSL::Cipher.new("AES-128-ECB")
       result = MemoryIO.new
       encrypt ? cipher.encrypt : cipher.decrypt

@@ -18,8 +18,8 @@ describe "2.10" do
   it "encrypts ECB" do
     text = "I'm back and I'm ringin the bell".to_slice
     key = "YELLOW SUBMARINE".to_slice
-    encrypted = Cryptopals::AES.encrypt_ecb_128(key, text)
-    decrypted = Cryptopals::AES.decrypt_ecb_128(key, encrypted)
+    encrypted = Cryptopals::AES.encrypt_ecb_128(text, key)
+    decrypted = Cryptopals::AES.decrypt_ecb_128(encrypted, key)
     decrypted.should eq(text)
   end
 
