@@ -4,6 +4,18 @@ module Cryptopals
 
   module AES
 
+    enum Mode
+      ECB
+      CBC
+    end
+
+    def self.encrypt(mode : Mode, ciphertext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
+      case mode
+      when Mode::ECB then encrypt_ecb_128(ciphertext, key)
+      when Mode::CBC then encrypt_cbc_128(ciphertext, key, iv)
+      end
+    end
+
     def self.decrypt_cbc_128(ciphertext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
       raise "Invalid key size: #{key.size}" unless key.size == 16
       raise "Invalid iv size: #{iv.size}" unless iv.size == 16

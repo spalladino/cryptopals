@@ -50,7 +50,7 @@ describe "1.6" do
 
     keysize_candidates.each do |keysize|
       keys_per_block = input.in_groups_of(keysize[:keysize], filled_up_with: 0_u8).transpose.map do |block|
-        Cryptopals::XorCipher.single_char_xor_strings(block.to_slice).first(5).map(&.[:mask])
+        Cryptopals::Attacks::XorCipher.single_char_xor_strings(block.to_slice).first(5).map(&.[:mask])
       end
 
       keys = [0,1,2,3,4].repeated_combinations(keysize[:keysize]).map do |indices|
