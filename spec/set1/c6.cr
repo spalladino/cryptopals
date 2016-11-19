@@ -30,20 +30,7 @@ describe "1.6" do
     input = Base64.decode(File.read("./spec/set1/data/c6.input.txt").strip).to_slice
 
     # Guess keysize
-    keysize_candidates = (2..40).map do |keysize|
-      chunks = [
-        input[0, keysize],
-        input[keysize, keysize],
-        input[2 * keysize, keysize],
-        input[3 * keysize, keysize]
-      ]
-
-      score = (chunks[0].hamming_distance(chunks[1]) \
-               + chunks[1].hamming_distance(chunks[2]) \
-               + chunks[2].hamming_distance(chunks[3])).to_f32 / keysize
-
-      { keysize: keysize, score: score }
-    end.sort_by(&.[:score])[0..3]
+    keysize_candidates = Cryptopals::Attacks::Keysize.detect_keysizes(input, (2..40))[0..3]
 
     # Try breaking the text for each keysize candidate
     results = Array(NamedTuple(string: String, key: Bytes, score: Float32)).new

@@ -24,7 +24,11 @@ end
 
 class Array(T)
   def to_slice : Slice(T)
-    Slice(T).new(Slice(T).new(self.size).copy_from(self.to_unsafe, self.size), self.size)
+    Slice(T).new(self.size).tap { |s| s.copy_from(self.to_unsafe, self.size) }
+  end
+
+  def as_slice : Slice(T)
+    Slice(T).new(self.to_unsafe, self.size)
   end
 end
 
