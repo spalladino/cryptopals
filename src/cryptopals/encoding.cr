@@ -20,6 +20,10 @@ class String
     end
     bytes
   end
+
+  def to_a
+    self.to_slice.to_a
+  end
 end
 
 class Array(T)
