@@ -24,7 +24,7 @@ describe "2.9" do
   end
 
   it "pads yellow submarine to 8 bytes" do
-    actual = Cryptopals::PKCS.pad("YELLOW SUBMARINE".to_slice)
+    actual = Cryptopals::PKCS.pad("YELLOW SUBMARINE".to_slice, 8)
     String.new(actual).should eq("YELLOW SUBMARINE\u{8}\u{8}\u{8}\u{8}\u{8}\u{8}\u{8}\u{8}")
   end
 end

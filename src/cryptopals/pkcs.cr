@@ -2,7 +2,7 @@ module Cryptopals
 
   module PKCS
 
-    def self.pad(input : Bytes, size = 8) : Bytes
+    def self.pad(input : Bytes, size = 16) : Bytes
       newsize = ((input.size / size) + 1) * size
       padded = Slice(UInt8).new(newsize)
       padded.copy_from(input.to_unsafe, input.size)
@@ -11,7 +11,7 @@ module Cryptopals
       padded
     end
 
-    def self.unpad(input : Bytes, size = 8) : Bytes
+    def self.unpad(input : Bytes, size = 16) : Bytes
       last = input[-1]
       raise "Invalid padding: invalid last byte #{last} for unpadding on size #{size}" if last > size || last == 0
       (input + (input.size - last)).each_with_index do |b, i|
@@ -25,11 +25,11 @@ module Cryptopals
 end
 
 struct Slice(T)
-  def pad(size = 8)
+  def pad(size = 16)
     Cryptopals::PKCS.pad(self, size)
   end
 
-  def unpad(size = 8)
+  def unpad(size = 16)
     Cryptopals::PKCS.unpad(self, size)
   end
 end
