@@ -27,7 +27,10 @@ describe "2.11" do
     plaintext = "Hello there is a text there is a text there is a text"
     hits = 0
     100.times do
-      expected = Cryptopals::Oracles::AES.encryption_oracle(plaintext.to_slice)
+      prefix = SecureRandom.random_bytes(rand(5..10))
+      suffix = SecureRandom.random_bytes(rand(5..10))
+      oracle = Cryptopals::Oracles::AES::Oracle.new(prefix: prefix, suffix: suffix)
+      expected = oracle.encrypt(plaintext.to_slice)
       actual = Cryptopals::Attacks::AES.detect_mode(expected[:encrypted].not_nil!)
       hits += 1 if expected[:mode] == actual[:mode]
     end

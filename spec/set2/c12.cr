@@ -37,28 +37,23 @@ describe "2.12" do
   it "decrypts ECB a byte at a time" do
 
     # Setup oracle
-    key = SecureRandom.random_bytes(16)
     fixed = Base64.decode("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK")
-    oracle = ->(input : Bytes) do
-      target = Bytes.new(input.size + fixed.size)
-      target.copy_from(input)
-      (target + input.size).copy_from(fixed)
-      Cryptopals::AES.encrypt_ecb_128(Cryptopals::PKCS.pad(target, 16), key)
-    end
+    oracle = Cryptopals::Oracles::AES::Oracle.new(mode: Cryptopals::AES::Mode::ECB, suffix: fixed)
+    oracle_fun = ->(input : Bytes) { oracle.encrypt(input)[:encrypted].not_nil! }
 
     # Detect keysize
     keysize = 128.times.flat_map do |i|
-      encrypted = oracle.call ("A" * i).to_slice
+      encrypted = oracle_fun.call ("A" * i).to_slice
       Cryptopals::Attacks::Keysize.detect_keysizes(encrypted).first(3)
     end.sort_by(&.[:score]).first[:keysize]
     keysize.should eq(16)
 
     # Detect mode
-    encrypted = oracle.call ("A" * 256).to_slice
+    encrypted = oracle_fun.call ("A" * 256).to_slice
     Cryptopals::Attacks::AES.detect_mode(encrypted)[:mode].should eq(Cryptopals::AES::Mode::ECB)
 
     # Break it
-    broken = Cryptopals::Attacks::AES.break_ecb_byte_at_a_time(oracle)
+    broken = Cryptopals::Attacks::AES.break_ecb_byte_at_a_time(oracle_fun)
     broken.should eq(fixed)
   end
 
