@@ -31,10 +31,25 @@ require "../spec_helper"
 #
 # 1. Completely scrambles the block the error occurs in
 # 2. Produces the identical 1-bit error(/edit) in the next ciphertext block.
-# 
+#
 describe "2.16" do
 
   it "performs CBC bit flipping attack" do
+    oracle = Cryptopals::Oracles::UserData::Oracle.new
+    prefix = "comment1=cooking%20MCs;userdata="
+    suffix = ";comment2=%20like%20a%20pound%20of%20bacon"
+    target = ";admin=true;c2=k"
+    flips  = suffix.to_slice[0,16].xor(target.to_slice)
+
+    prefix.size.should eq(32)
+    target.size.should eq(16)
+    flips.size.should eq(16)
+
+    input = "A" * 16
+    encrypted = oracle.encrypted_cookie_for(input)
+    (encrypted + 32).copy_from(encrypted[32, 16].xor(flips))
+
+    oracle.is_admin?(encrypted).should be_true
   end
 
 end
