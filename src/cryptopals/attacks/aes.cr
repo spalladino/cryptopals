@@ -44,4 +44,39 @@ module Cryptopals::Attacks::AES
     raise "Could not break byte"
   end
 
+  def self.break_cbc_padding_oracle(valid_fun, iv, ciphertext)
+    decrypted = Bytes.new(ciphertext.size)
+    previous_block = iv
+    (0...ciphertext.size).step(16) do |position|
+      current_block = ciphertext[position, 16]
+      break_cbc_block_padding_oracle(valid_fun, previous_block, current_block, decrypted[position, 16])
+      previous_block = current_block
+    end
+    decrypted.unpad
+  end
+
+  private def self.break_cbc_block_padding_oracle(valid_fun, previous_block, current_block, decrypted_block)
+    original_block = Bytes.new(16).tap { |bs| bs.copy_from(previous_block) }
+    previous_block = Bytes.new(16).tap { |bs| bs.copy_from(previous_block) }
+
+    (1..16).each do |pad_size|
+      broken = (1..256).each do |b|
+        byte = (b % 256).to_u8
+        position = 16 - pad_size
+        previous_block[position] = original_block[position] ^ byte
+
+        # orig xor change = pad_size => change = orig xor pad_size
+        ((position+1)...16).each { |i| previous_block[i] = original_block[i] ^ (decrypted_block[i] ^ pad_size) }
+
+        if valid_fun.call(previous_block, current_block)
+          # orig xor byte = pad_size => orig = pad_size xor byte
+          decrypted_block[position] = byte ^ pad_size.to_u8
+          break true
+        end
+        false
+      end
+      raise "Could not break position #{pad_size}" unless broken
+    end
+  end
+
 end

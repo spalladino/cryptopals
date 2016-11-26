@@ -9,10 +9,19 @@ module Cryptopals
       CBC
     end
 
-    def self.encrypt(mode : Mode, ciphertext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
+    def self.encrypt(mode : Mode, plaintext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
       case mode
-      when Mode::ECB then encrypt_ecb_128(ciphertext, key)
-      when Mode::CBC then encrypt_cbc_128(ciphertext, key, iv)
+      when Mode::ECB then encrypt_ecb_128(plaintext, key)
+      when Mode::CBC then encrypt_cbc_128(plaintext, key, iv)
+      else raise "Unknown mode #{mode}"
+      end
+    end
+
+    def self.decrypt(mode : Mode, ciphertext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
+      case mode
+      when Mode::ECB then decrypt_ecb_128(ciphertext, key)
+      when Mode::CBC then decrypt_cbc_128(ciphertext, key, iv)
+      else raise "Unknown mode #{mode}"
       end
     end
 
@@ -35,6 +44,7 @@ module Cryptopals
     def self.encrypt_cbc_128(plaintext : Bytes, key : Bytes, iv : Bytes = Slice(UInt8).new(16))
       raise "Invalid key size: #{key.size}" unless key.size == 16
       raise "Invalid iv size: #{iv.size}" unless iv.size == 16
+      raise "Unpadded plaintext: #{plaintext.size}" unless plaintext.size % 16 == 0
 
       result = Slice(UInt8).new(plaintext.size)
       previous = iv

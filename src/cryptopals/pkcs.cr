@@ -20,6 +20,15 @@ module Cryptopals
       input[0, (input.size - last)]
     end
 
+    def self.valid_padding?(input : Bytes, size = 16) : Bool
+      last = input[-1]
+      return false if last > size || last == 0
+      (input + (input.size - last)).each_with_index do |b, i|
+        return false unless b == last
+      end
+      return true
+    end
+
   end
 
 end
