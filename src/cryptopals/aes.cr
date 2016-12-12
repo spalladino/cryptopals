@@ -1,9 +1,7 @@
 require "openssl/cipher"
 
 module Cryptopals
-
   module AES
-
     enum Mode
       ECB
       CBC
@@ -13,7 +11,7 @@ module Cryptopals
       case mode
       when Mode::ECB then encrypt_ecb_128(plaintext, key)
       when Mode::CBC then encrypt_cbc_128(plaintext, key, iv)
-      else raise "Unknown mode #{mode}"
+      else                raise "Unknown mode #{mode}"
       end
     end
 
@@ -21,7 +19,7 @@ module Cryptopals
       case mode
       when Mode::ECB then decrypt_ecb_128(ciphertext, key)
       when Mode::CBC then decrypt_cbc_128(ciphertext, key, iv)
-      else raise "Unknown mode #{mode}"
+      else                raise "Unknown mode #{mode}"
       end
     end
 
@@ -70,7 +68,7 @@ module Cryptopals
 
     private def self.cipher(cipher_algorithm : String, encrypt : Bool, text : Bytes, key : Bytes, iv = nil)
       cipher = OpenSSL::Cipher.new(cipher_algorithm)
-      result = MemoryIO.new
+      result = IO::Memory.new
       encrypt ? cipher.encrypt : cipher.decrypt
       cipher.padding = false
       cipher.key = key
@@ -79,7 +77,5 @@ module Cryptopals
       result.write(cipher.final)
       result.to_slice
     end
-
   end
-
 end

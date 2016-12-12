@@ -1,3 +1,5 @@
+require "./freqs/*"
+
 module Cryptopals
   FREQUENCIES = Hash(Char, Float32).new
   FREQUENCIES['E'] = 0.1202_f32
@@ -30,7 +32,7 @@ end
 
 struct Char
   def freq : Float32
-    Cryptopals::FREQUENCIES.fetch(self.upcase, 0_f32) rescue 0_f32
+    Cryptopals::Frequencies.freq(self)
   end
 end
 
@@ -38,13 +40,13 @@ class String
   def freqscore : Float32
     begin
       freqs = Hash(Char, Int32).new(0)
-      return Float32::MAX if self.chars.any?{|c| c.control? && c != '\n'}
+      return Float32::MAX if self.chars.any? { |c| c.control? && c != '\n' }
       self.chars.each { |c| freqs[c.upcase] += 1 }
     rescue
       return Float32::MAX
     end
 
-    Cryptopals::FREQUENCIES.map do |char, expected_freq|
+    Cryptopals::Frequencies::LETTERS.map do |char, expected_freq|
       actual_freq = freqs[char].to_f32 / self.size
       (expected_freq - actual_freq) ** 2
     end.sum

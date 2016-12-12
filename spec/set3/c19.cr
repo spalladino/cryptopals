@@ -67,7 +67,6 @@ require "base64"
 # Attack this cryptosystem piecemeal: guess letters, use expected English language frequence to validate guesses, catch common English trigrams, and so on.
 #
 describe "3.19" do
-
   it "breaks fixed-nonce CTR mode using substitutions" do
     inputs = [
       "SSBoYXZlIG1ldCB0aGVtIGF0IGNsb3NlIG9mIGRheQ==",
@@ -109,8 +108,12 @@ describe "3.19" do
       "SW4gdGhlIGNhc3VhbCBjb21lZHk7",
       "SGUsIHRvbywgaGFzIGJlZW4gY2hhbmdlZCBpbiBoaXMgdHVybiw=",
       "VHJhbnNmb3JtZWQgdXR0ZXJseTo=",
-      "QSB0ZXJyaWJsZSBiZWF1dHkgaXMgYm9ybi4="
+      "QSB0ZXJyaWJsZSBiZWF1dHkgaXMgYm9ybi4=",
     ]
-  end
 
+    key = SecureRandom.random_bytes(16)
+    encrypted = inputs.map do |input|
+      Cryptopals::CTR.crypt(Base64.decode(input), key)
+    end
+  end
 end

@@ -2,9 +2,7 @@ require "io/byte_format"
 require "./aes"
 
 module Cryptopals
-
   module CTR
-
     def self.crypt(input : Bytes, key : Bytes, nonce : UInt64 = 0_u64)
       output = Bytes.new(input.size)
       (0...input.size).step(16) do |index|
@@ -20,13 +18,11 @@ module Cryptopals
 
     private def self.keyblock(nonce : UInt64, counter : UInt64)
       Bytes.new(16).tap do |bytes|
-        MemoryIO.new(bytes).tap do |io|
+        IO::Memory.new(bytes).tap do |io|
           IO::ByteFormat::LittleEndian.encode(nonce, io)
           IO::ByteFormat::LittleEndian.encode(counter, io)
         end
       end
     end
-
   end
-
 end

@@ -1,9 +1,7 @@
 require "secure_random"
 
 module Cryptopals::Oracles::AES
-
   class Oracle
-
     @mode : Cryptopals::AES::Mode
 
     def initialize(mode : Cryptopals::AES::Mode? = nil, @prefix : Bytes? = nil, @suffix : Bytes? = nil)
@@ -13,7 +11,7 @@ module Cryptopals::Oracles::AES
     end
 
     def encrypt(input : Bytes)
-      full_input = MemoryIO.new
+      full_input = IO::Memory.new
       if prefix = @prefix
         full_input.write(prefix)
       end
@@ -24,9 +22,7 @@ module Cryptopals::Oracles::AES
       full_input = Cryptopals::PKCS.pad(full_input.to_slice, 16)
 
       encrypted = Cryptopals::AES.encrypt(@mode, full_input, @key, @iv)
-      return { encrypted: encrypted, input: input, full_input: full_input.to_slice, key: @key, mode: @mode, iv: @iv }
+      return {encrypted: encrypted, input: input, full_input: full_input.to_slice, key: @key, mode: @mode, iv: @iv}
     end
-
   end
-
 end
